@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="main">
+        <form @submit.prevent="addUsuario">
+            <input v-model="nombre" type="text" id="nombre" placeholder="Intoduce tu nombre">
+            <input v-model="edad" type="text" id="edad" placeholder="Intoduce tu edad">
+            <input type="submit" value="Añadir Usuario">
+        </form>
+        <hr>
+        <h2>Listado de Usuarios</h2>
+        <ul>
+            <li v-for="usuario in usuarios">{{ usuario.data.nombre }} | {{ usuario.data.edad }}</li>
+        </ul>
+    </div>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-firestore.js"></script>
+    <script>
+        var config = {
+            apiKey: "AIzaSyAfIinIvHCMR1aN08mdr5DnMWfA0zJnmIo",
+            authDomain: "pruebasvue-d590a.firebaseapp.com",
+            projectId: "pruebasvue-d590a",
+            storageBucket: "pruebasvue-d590a.appspot.com",
+            messagingSenderId: "1083291999409",
+            appId: "1:1083291999409:web:d73b8a4dd24097034dd690"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(config);
+
+        const db = firebase.firestore();
+        const collection = db.collection('usuarios');
+
+        new Vue({
+            el: '#main',
+            data() {
+                return {
+                    nombre: null,
+                    edad: null,
+                    usuarios: []
+                }
+            },
+            methods: {
+                addUsuario() {
+                    collection.add({
+                        nombre: this.nombre,
+                        edad: this.edad
+                    })
+                }
+            },
+            mounted() {
+                this.usuarios = [];
+                collection.get()
+                .then((res) => {
+                    res.docs.map(item => {
+                        this.usuarios.push({ id: item.id, data: item.data() });
+                    })
+                })
+            },
+        })
+    </script>
+</body>
+</html>
